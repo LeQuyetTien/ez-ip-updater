@@ -1,6 +1,54 @@
-__pycache__/
-.pytest_cache/
-config.json
+# Credentials
 gcp-credentials.json
-.DS_Store
+aws-credentials.json
+
+# Config (should be created from example)
+config.json
+
+# Cache and logs
+last_known_ip.txt
 ip_update.log
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

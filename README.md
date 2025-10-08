@@ -1,11 +1,24 @@
-# IP Updater v1.0 - Tự Động Cập Nhật IP Công Cộng
+# IP Updater v2.0 - Tự Động Cập Nhật IP Công Cộng
 
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 IP Updater là script tự động phát hiện thay đổi IP công cộng và cập nhật vào:
+
 - **Google Cloud Platform**: Firewall Rules, Cloud SQL Authorized Networks
 - **Amazon Web Services**: Security Groups (SSH, MySQL, custom ports)
+
+---
+
+## 🚀 Tính Năng Mới v2.0
+
+- **Kiến trúc OOP**: Tách lớp rõ ràng, dễ mở rộng
+- **CLI Arguments**: Hỗ trợ `--dry-run`, `--force`, `--verbose`
+- **Xử lý lỗi chi tiết**
+- **Logging nâng cao**: Console & file, nhiều cấp độ
+- **Không lặp code**: Tuân thủ nguyên tắc DRY
+- **Test coverage >85%**
+- **Cài đặt phụ thuộc linh hoạt**: Chỉ cần SDK bạn sử dụng
 
 ---
 
@@ -62,7 +75,38 @@ export AWS_SECRET_ACCESS_KEY="your-secret"
 ### 4. Chạy Script
 
 ```bash
-python3 auto_update_ip.py
+python3 auto_update_ip.py                # Chạy bình thường
+python3 auto_update_ip.py --dry-run      # Chạy thử, không thay đổi thật
+python3 auto_update_ip.py --force        # Buộc cập nhật kể cả IP không đổi
+python3 auto_update_ip.py --verbose      # Hiển thị log chi tiết
+```
+
+---
+
+## 🛠️ Sử Dụng
+
+### CLI Options
+
+```bash
+usage: auto_update_ip.py [-h] [-c CONFIG] [--dry-run] [--force] [-v] [--version]
+
+options:
+  -h, --help            Hiển thị help
+  -c, --config CONFIG   Đường dẫn file cấu hình (default: config.json)
+  --dry-run             Chạy thử, không thực hiện thay đổi thực tế
+  --force               Buộc cập nhật kể cả khi IP không thay đổi
+  -v, --verbose         Hiển thị log chi tiết (DEBUG level)
+  --version             Hiển thị version
+```
+
+**Ví dụ:**
+
+```bash
+python3 auto_update_ip.py                          # Chạy với config mặc định
+python3 auto_update_ip.py --config prod.json       # Dùng config file khác
+python3 auto_update_ip.py --dry-run                # Chạy thử
+python3 auto_update_ip.py --force                  # Buộc cập nhật
+python3 auto_update_ip.py --verbose                # Log chi tiết
 ```
 
 ---
@@ -191,7 +235,7 @@ pytest --cov=auto_update_ip --cov-report=html
 
 ```
 ip-updater/
-├── auto_update_ip.py          # Main script (v1.0)
+├── auto_update_ip.py          # Main script (v2.0)
 ├── config.json                # Config cá nhân (gitignored)
 ├── config.json.example        # Mẫu config
 ├── gcp-credentials.json       # GCP credentials (gitignored)
@@ -224,6 +268,7 @@ ip-updater/
 
 - Roles: `roles/compute.securityAdmin`, `roles/cloudsql.admin`
 - Hoặc custom role:
+
 ```yaml
 compute.firewalls.get
 compute.firewalls.update
@@ -234,6 +279,7 @@ cloudsql.instances.update
 #### AWS
 
 IAM policy tối thiểu:
+
 ```json
 {
   "Version": "2012-10-17",
@@ -285,6 +331,19 @@ cat ~/.aws/credentials
 aws sts get-caller-identity
 ```
 
+### Không phát hiện thay đổi IP
+
+```bash
+rm last_known_ip.txt
+python3 auto_update_ip.py --force --verbose
+```
+
+### Test dry-run
+
+```bash
+python3 auto_update_ip.py --dry-run --verbose
+```
+
 ### Kiểm tra logs
 
 ```bash
@@ -295,6 +354,16 @@ tail -f ip_update.log | grep "ERROR\|WARNING"
 ---
 
 ## 📝 Changelog
+
+### v2.0.0 (2025-10-08)
+
+- Refactor OOP
+- Thêm CLI arguments
+- Logging & error handling nâng cao
+- Loại bỏ lặp code
+- Optional dependencies
+- Test suite đầy đủ
+- Cập nhật tài liệu
 
 ### v1.0.0
 
@@ -338,7 +407,7 @@ Dự án theo MIT License - xem [LICENSE](LICENSE) để biết chi tiết.
 
 ## 📞 Hỗ Trợ
 
-- 📧 Email: lequyettien.it@gmail.com
+- 📧 Email: [lequyettien.it@gmail.com](mailto:lequyettien.it@gmail.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/lequyettien/ip-updater/issues)
 - 📖 Docs: [Wiki](https://github.com/lequyettien/ip-updater/wiki)
 
