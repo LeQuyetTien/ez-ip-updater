@@ -1,0 +1,42 @@
+{
+  "gcp": {
+    "project_id": "your-gcp-project-id",
+    "credentials_file": "gcp-credentials.json",
+    "firewall_rules": [
+      "your-firewall-rule-name"
+    ],
+    "sql_instances": [
+      "your-cloud-sql-instance-name"
+    ]
+  },
+  "aws": {
+    "region": "us-east-1",
+    "security_groups_ssh": [
+      {
+        "group_id": "sg-xxxxxxxxxxxxxxxxx",
+        "description": "Office IP SSH"
+      }
+    ],
+    "security_groups_mysql": [
+      {
+        "group_id": "sg-yyyyyyyyyyyyyyyyy",
+        "description": "Office IP MySQL"
+      }
+    ],
+    "ports_ssh": [
+      {
+        "protocol": "tcp",
+        "port": 22,
+        "description": "SSH"
+      }
+    ],
+    "ports_mysql": [
+      {
+        "protocol": "tcp",
+        "port": 3306,
+        "description": "MySQL"
+      }
+    ]
+  },
+  "ip_cache_file": "last_known_ip.txt"
+}
