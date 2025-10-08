@@ -1,0 +1,52 @@
+name: Build and publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    name: Build and publish to TestPyPI (default)
+    runs-on: ubuntu-latest
+    env:
+      # Change this to 'pypi' to publish to the real PyPI (and add the PYPI_API_TOKEN secret)
+      PUBLISH_TO: testpypi
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade build twine
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      # By default we publish to TestPyPI (safer). To enable publishing to real PyPI,
+      # change PUBLISH_TO to 'pypi' and add a repository secret named PYPI_API_TOKEN.
+      - name: Publish to TestPyPI
+        if: env.PUBLISH_TO == 'testpypi'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          python -m twine upload --repository testpypi dist/*
+
+      - name: Publish to PyPI (optional)
+        if: env.PUBLISH_TO == 'pypi'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m twine upload dist/*
+
+      - name: Done
+        run: echo "Publish job finished."
