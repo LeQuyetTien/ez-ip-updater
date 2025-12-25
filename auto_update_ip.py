@@ -162,13 +162,21 @@ class IPService:
             f.write(ip)
         self.logger.debug(f"Đã lưu IP vào cache: {ip}")
     
-    def check_ip_change(self) -> Tuple[Optional[str], Optional[str], bool]:
+    def check_ip_change(self, custom_ip: Optional[str] = None) -> Tuple[Optional[str], Optional[str], bool]:
         """
         Kiểm tra thay đổi IP
+        Args:
+            custom_ip: IP tùy chỉnh (nếu có)
         Returns: (cached_ip, current_ip, changed)
         """
         cached_ip = self.get_cached_ip()
-        current_ip = self.get_current_ip()
+        
+        # Ưu tiên custom IP nếu được cung cấp
+        if custom_ip:
+            self.logger.info(f"🎯 Sử dụng custom IP: {custom_ip}")
+            current_ip = custom_ip
+        else:
+            current_ip = self.get_current_ip()
         
         if current_ip is None:
             return cached_ip, None, False
@@ -530,8 +538,9 @@ class AWSUpdater:
 class IPUpdater:
     """Main IP updater orchestrator"""
     
-    def __init__(self, config_path: str, dry_run: bool = False, verbose: bool = False):
+    def __init__(self, config_path: str, dry_run: bool = False, verbose: bool = False, custom_ip: Optional[str] = None):
         self.dry_run = dry_run
+        self.custom_ip = custom_ip
         self.logger = self._setup_logger(verbose)
         self.config = Config(config_path)
         self.ip_service = IPService(self.config.ip_cache_file, self.logger)
@@ -574,7 +583,7 @@ class IPUpdater:
         self.logger.info("=" * 60)
         
         # Kiểm tra thay đổi IP
-        cached_ip, current_ip, changed = self.ip_service.check_ip_change()
+        cached_ip, current_ip, changed = self.ip_service.check_ip_change(self.custom_ip)
         
         if current_ip is None:
             self.logger.error("✗ Không thể lấy IP công cộng. Dừng.")
@@ -626,6 +635,7 @@ Examples:
   %(prog)s --config prod.json       # Dùng config file khác
   %(prog)s --dry-run                # Chạy thử không thay đổi thật
   %(prog)s --force                  # Buộc cập nhật kể cả IP không đổi
+  %(prog)s --custom-ip 203.0.113.5  # Dùng IP tùy chỉnh thay vì tự phát hiện
   %(prog)s --verbose                # Hiển thị log chi tiết
         """
     )
@@ -646,6 +656,11 @@ Examples:
         help='Buộc cập nhật kể cả khi IP không thay đổi'
     )
     parser.add_argument(
+        '--custom-ip',
+        type=str,
+        help='Sử dụng IP tùy chỉnh thay vì tự động phát hiện (VD: 203.0.113.5)'
+    )
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         help='Hiển thị log chi tiết (DEBUG level)'
@@ -662,7 +677,8 @@ Examples:
         updater = IPUpdater(
             config_path=args.config,
             dry_run=args.dry_run,
-            verbose=args.verbose
+            verbose=args.verbose,
+            custom_ip=args.custom_ip
         )
         sys.exit(updater.run(force=args.force))
     except Exception as e:
