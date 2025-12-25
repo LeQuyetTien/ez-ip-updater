@@ -396,10 +396,11 @@ class GCPUpdater:
 class AWSUpdater:
     """AWS IP updater"""
     
-    def __init__(self, config: dict, logger: logging.Logger, dry_run: bool = False):
+    def __init__(self, config: dict, logger: logging.Logger, dry_run: bool = False, profile: Optional[str] = None):
         self.config = config
         self.logger = logger
         self.dry_run = dry_run
+        self.profile = profile or config.get('profile')
     
     def update_security_groups(self, old_ip: Optional[str], new_ip: str) -> bool:
         """Cập nhật tất cả AWS Security Groups"""
@@ -438,7 +439,14 @@ class AWSUpdater:
             return True
         
         try:
-            ec2 = boto3.client('ec2', region_name=self.config.get('region'))
+            # Tạo boto3 client với profile nếu có
+            client_kwargs = {'region_name': self.config.get('region')}
+            if self.profile:
+                session = boto3.Session(profile_name=self.profile)
+                ec2 = session.client('ec2', region_name=self.config.get('region'))
+                self.logger.debug(f"Sử dụng AWS profile: {self.profile}")
+            else:
+                ec2 = boto3.client('ec2', **client_kwargs)
             success_count = 0
             
             for sg in security_groups:
@@ -538,14 +546,14 @@ class AWSUpdater:
 class IPUpdater:
     """Main IP updater orchestrator"""
     
-    def __init__(self, config_path: str, dry_run: bool = False, verbose: bool = False, custom_ip: Optional[str] = None):
+    def __init__(self, config_path: str, dry_run: bool = False, verbose: bool = False, custom_ip: Optional[str] = None, aws_profile: Optional[str] = None):
         self.dry_run = dry_run
         self.custom_ip = custom_ip
         self.logger = self._setup_logger(verbose)
         self.config = Config(config_path)
         self.ip_service = IPService(self.config.ip_cache_file, self.logger)
         self.gcp_updater = GCPUpdater(self.config.gcp, self.logger, dry_run)
-        self.aws_updater = AWSUpdater(self.config.aws, self.logger, dry_run)
+        self.aws_updater = AWSUpdater(self.config.aws, self.logger, dry_run, aws_profile)
     
     def _setup_logger(self, verbose: bool) -> logging.Logger:
         """Setup logging configuration"""
@@ -661,6 +669,11 @@ Examples:
         help='Sử dụng IP tùy chỉnh thay vì tự động phát hiện (VD: 203.0.113.5)'
     )
     parser.add_argument(
+        '--aws-profile',
+        type=str,
+        help='AWS profile name để sử dụng (default: profile trong config hoặc default)'
+    )
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         help='Hiển thị log chi tiết (DEBUG level)'
@@ -678,7 +691,8 @@ Examples:
             config_path=args.config,
             dry_run=args.dry_run,
             verbose=args.verbose,
-            custom_ip=args.custom_ip
+            custom_ip=args.custom_ip,
+            aws_profile=args.aws_profile
         )
         sys.exit(updater.run(force=args.force))
     except Exception as e:
