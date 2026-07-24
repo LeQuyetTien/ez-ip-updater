@@ -6,8 +6,11 @@ aws-credentials.json
 config.json
 
 # Cache and logs
-last_known_ip.txt
+ip_state.json
+.ip_updater.lock
 ip_update.log
+launchd-output.log
+launchd-error.log
 *.log
 
 # Python
@@ -48,6 +51,10 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Local exports and backups
+mongo-backup-*/
+production_logs_backup.json
 
 # OS
 .DS_Store

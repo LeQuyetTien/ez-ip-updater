@@ -1,5 +1,6 @@
 {
   "gcp": {
+    "enabled": true,
     "project_id": "your-gcp-project-id",
     "credentials_file": "gcp-credentials.json",
     "firewall_rules": [
@@ -10,6 +11,7 @@
     ]
   },
   "aws": {
+    "enabled": true,
     "region": "us-east-1",
     "security_groups_ssh": [
       {
@@ -38,5 +40,6 @@
       }
     ]
   },
-  "ip_cache_file": "last_known_ip.txt"
+  "state_file": "ip_state.json",
+  "lock_file": ".ip_updater.lock"
 }

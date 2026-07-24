@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "setuptools_scm"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ez-ip-updater"
-version = "2.0.0"
+version = "2.1.0"
 description = "Tự động phát hiện IP công cộng và cập nhật vào Google Cloud / AWS"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [ { name = "Le Quyet Tien" } ]
 keywords = ["gcp", "aws", "ip", "firewall", "security-groups"]
@@ -32,7 +32,9 @@ aws = [
 all = ["google-cloud-compute", "google-api-python-client", "boto3"]
 
 [project.scripts]
-ez-ip-updater = "auto_update_ip:main"
+ez-ip-updater = "ez_ip_updater.cli:main"
+ez-ip-updater-install = "ez_ip_updater.autostart:install_main"
+ez-ip-updater-uninstall = "ez_ip_updater.autostart:uninstall_main"
 
-[tool.setuptools]
-py-modules = ["auto_update_ip"]
+[tool.setuptools.packages.find]
+include = ["ez_ip_updater*"]

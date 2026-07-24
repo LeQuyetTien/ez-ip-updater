@@ -4,6 +4,35 @@ All notable changes to **IP Updater** are documented here.
 
 This project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- One-command autostart installer and uninstaller for macOS and Windows.
+- Tests for LaunchAgent and Windows Scheduled Task generation.
+- Per-provider state, atomic writes, process locking, and rotating logs.
+- Provider enable/disable flags and strict IPv4 validation.
+- Installable CLI commands for updater and autostart management.
+
+### Changed
+
+- Reduced `requirements.txt` to direct project dependencies.
+- Ignored local backup exports and launchd logs.
+- Refactored the single module into the `ez_ip_updater` package.
+- AWS now authorizes the new IP before revoking the old IP.
+- Python 3.10 is now the minimum supported version.
+
+### Fixed
+
+- Optional GCP dependencies no longer cause an import-time annotation error.
+- GCP removes stale IPs even when the desired IP already exists.
+- Partial provider success is persisted without advancing failed providers.
+
+### Removed
+
+- Legacy root scripts and compatibility module.
+- Shared `last_known_ip.txt` cache; provider state is now authoritative.
+
 ## [2.0.0] - 2025-10-08
 
 ### 🎉 Major Refactoring Release
@@ -83,71 +112,6 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) an
 - AWS security groups update.
 - IP caching to avoid unnecessary updates.
 - Detailed logging.
-
-## Migration Guide: v1.0 → v2.0
-
-### Breaking Changes
-
-**None** — v2.0 is backward compatible. Existing `config.json` and credentials remain valid.
-
-### Recommended Updates
-
-1. **Update script file**:
-
-    ```bash
-    # Backup old version
-    cp auto_update_ip.py auto_update_ip_v1.py
-
-    # Use new version
-    # (already done if you pulled latest)
-    ```
-
-2. **Utilize new CLI options**:
-
-    ```bash
-    # Dry-run mode
-    python3 auto_update_ip.py --dry-run
-
-    # Force update
-    python3 auto_update_ip.py --force
-
-    # Verbose logging
-    python3 auto_update_ip.py --verbose
-    ```
-
-3. **Update cron jobs** (optional):
-
-    ```cron
-    # Old
-    */5 * * * * cd /path/to/ip-updater && python3 auto_update_ip.py
-
-    # New with verbose logging
-    */5 * * * * cd /path/to/ip-updater && python3 auto_update_ip.py --verbose >> /var/log/ip_updater.log 2>&1
-    ```
-
-4. **Run tests** to verify:
-
-    ```bash
-    pytest tests/test_refactored.py -v
-    ```
-
-### Unchanged
-
-- ✅ `config.json` structure
-- ✅ Credentials setup
-- ✅ Log file location
-- ✅ Core functionality
-- ✅ No new dependencies required
-
-### Improvements
-
-- ✅ More reliable error handling
-- ✅ Enhanced logging with icons
-- ✅ Dry-run mode for safe testing
-- ✅ Force mode to override cache
-- ✅ Verbose mode for debugging
-- ✅ Cleaner, maintainable codebase
-- ✅ Improved test coverage
 
 ## Future Roadmap
 

@@ -1,50 +1,38 @@
-# Packaging & Publishing
+# Packaging and publishing
 
-This project includes a minimal `pyproject.toml` so it can be built and installed via pip.
-
-Build a source distribution and wheel locally:
+## Build
 
 ```bash
-python3 -m pip install --upgrade build twine
-python3 -m build
+python -m pip install --upgrade build twine
+python -m build
+python -m twine check dist/*
 ```
 
-After running `python3 -m build` you'll get files in the `dist/` folder.
+Wheel chứa package `ez_ip_updater` và ba console commands:
 
-Install locally from the generated wheel or sdist:
+- `ez-ip-updater`
+- `ez-ip-updater-install`
+- `ez-ip-updater-uninstall`
+
+## Verify locally
 
 ```bash
-python3 -m pip install dist/ez_ip_updater-2.0.0-py3-none-any.whl
-# or
-python3 -m pip install dist/ez_ip_updater-2.0.0.tar.gz
+python -m venv /tmp/ez-ip-updater-check
+/tmp/ez-ip-updater-check/bin/python -m pip install "dist/ez_ip_updater-2.1.0-py3-none-any.whl[all]"
+/tmp/ez-ip-updater-check/bin/ez-ip-updater --version
 ```
 
-Publishing to PyPI (test first):
+Trên Windows, dùng `Scripts\python.exe` thay cho `bin/python`.
+
+## Publish
+
+GitHub workflow publish khi push tag `v*`. TestPyPI là đích mặc định và cần
+repository secret `TEST_PYPI_API_TOKEN`.
 
 ```bash
-python3 -m pip install --upgrade twine
-python3 -m twine upload --repository testpypi dist/*
-# Verify installation from testpypi
-python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps ez-ip-updater
-
-# When ready to publish to real PyPI
-python3 -m twine upload dist/*
+git tag v2.1.0
+git push origin v2.1.0
 ```
 
-Continuous publishing via GitHub Actions
-
---------------------------------------
-
-This repo includes a workflow `.github/workflows/publish.yml` that will build and publish
-on every pushed tag that starts with `v` (for example `v2.0.0`). By default the workflow
-publishes to TestPyPI. To enable it:
-
-1. Go to the repo Settings → Secrets → Actions.
-2. Add `TEST_PYPI_API_TOKEN` with a token created on <https://test.pypi.org/account/token/>.
-3. Push a tag, e.g. `git tag v2.0.0 && git push origin v2.0.0`.
-
-To publish to the real PyPI instead:
-
-1. Create a token on <https://pypi.org/manage/account/token/>.
-2. Add repository secret `PYPI_API_TOKEN` with that token.
-3. Edit `.github/workflows/publish.yml` and set `PUBLISH_TO: pypi` in the workflow env.
+Để publish PyPI thật, đặt `PUBLISH_TO: pypi` trong workflow và thêm secret
+`PYPI_API_TOKEN`.
