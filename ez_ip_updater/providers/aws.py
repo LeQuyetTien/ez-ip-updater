@@ -118,6 +118,17 @@ class AWSUpdater:
             )
             return True
         except ClientError as exc:
+            if exc.response.get("Error", {}).get("Code") == "InvalidGroup.NotFound":
+                self.logger.error(
+                    "✗ Không tìm thấy %s %s trong AWS region %s "
+                    "(profile: %s). Kiểm tra tài khoản AWS, region và group_id; "
+                    "security group có thể đã bị xoá.",
+                    group_type,
+                    group_id,
+                    self.config.get("region", "không xác định"),
+                    self.profile or "credential chain mặc định",
+                )
+                return False
             self.logger.error(
                 "✗ Lỗi khi reconcile %s %s: %s", group_type, group_id, exc
             )

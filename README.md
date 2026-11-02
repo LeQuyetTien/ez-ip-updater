@@ -153,6 +153,13 @@ GCP hỗ trợ service-account file trong cấu hình hoặc Application Default
 Credentials. AWS hỗ trợ profile trong cấu hình/CLI và credential chain mặc định
 của Boto3.
 
+Nếu AWS báo `InvalidGroup.NotFound`, kiểm tra tài khoản đang sử dụng bằng
+`aws sts get-caller-identity` (thêm `--profile TEN_PROFILE` nếu cần), rồi kiểm
+tra `aws.region` và các `group_id` trong `config.json` với AWS Console. Security
+group chỉ tồn tại trong một region và tài khoản; hãy cập nhật ID nếu group đã
+bị xoá hoặc thay thế. Có thể chọn profile bằng `aws.profile` hoặc
+`ez-ip-updater --aws-profile TEN_PROFILE`.
+
 Chỉ cấp quyền cần thiết:
 
 - GCP: đọc/cập nhật firewall và Cloud SQL instance được cấu hình.

@@ -224,6 +224,24 @@ def test_aws_does_not_revoke_if_authorize_fails(logger):
     ec2.revoke_security_group_ingress.assert_not_called()
 
 
+def test_aws_missing_group_reports_region_and_profile(logger, caplog):
+    from botocore.exceptions import ClientError
+
+    updater = AWSUpdater({"region": "ap-southeast-1", "profile": "work"}, logger)
+    ec2 = Mock()
+    ec2.authorize_security_group_ingress.side_effect = ClientError(
+        {"Error": {"Code": "InvalidGroup.NotFound"}}, "authorize"
+    )
+    assert not updater._update_single_security_group(
+        ec2, {"group_id": "sg-1"}, "203.0.113.1", "203.0.113.2",
+        [{"protocol": "tcp", "port": 22}], "SSH"
+    )
+    assert "sg-1" in caplog.text
+    assert "ap-southeast-1" in caplog.text
+    assert "work" in caplog.text
+    ec2.revoke_security_group_ingress.assert_not_called()
+
+
 def test_aws_revoke_error_marks_update_failed(logger):
     from botocore.exceptions import ClientError
 
