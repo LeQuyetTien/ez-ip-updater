@@ -23,7 +23,7 @@ def test_install_macos_writes_plist(tmp_path):
     home = tmp_path / "home"
     with (
         patch.object(Path, "home", return_value=home),
-        patch.object(autostart.os, "getuid", return_value=501),
+        patch.object(autostart.os, "getuid", return_value=501, create=True),
         patch.object(autostart.subprocess, "run") as run,
     ):
         target = autostart.install_macos(config)
@@ -41,7 +41,7 @@ def test_uninstall_macos_removes_plist(tmp_path):
     target.write_text("temporary")
     with (
         patch.object(Path, "home", return_value=home),
-        patch.object(autostart.os, "getuid", return_value=501),
+        patch.object(autostart.os, "getuid", return_value=501, create=True),
         patch.object(autostart.subprocess, "run"),
     ):
         autostart.uninstall_macos()
