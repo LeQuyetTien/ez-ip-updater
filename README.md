@@ -115,6 +115,17 @@ Cài cho user hiện tại:
 ez-ip-updater-install
 ```
 
+Trên macOS, có thể cài lại trực tiếp bằng Python của môi trường ảo mà không
+cần kích hoạt môi trường trong terminal:
+
+```bash
+./.venv/bin/ez-ip-updater-install
+```
+
+LaunchAgent dùng Python trong `.venv`, chạy sau khi user đăng nhập và tiếp tục
+thử lại mỗi 5 phút. Nếu đã cài autostart trước đó, chạy lại lệnh trên một lần
+để cập nhật cấu hình.
+
 Trình cài đặt sẽ:
 
 - macOS: tạo LaunchAgent.

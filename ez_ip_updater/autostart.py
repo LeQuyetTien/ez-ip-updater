@@ -28,7 +28,8 @@ def command_for(
     config: str | Path = "config.json",
     python: Optional[Path] = None,
 ) -> list[str]:
-    executable = (python or Path(sys.executable)).resolve()
+    # Resolving symlinks here escapes a venv and loses its installed packages.
+    executable = Path(os.path.abspath(python or sys.executable))
     return [
         str(executable),
         "-m",

@@ -16,6 +16,13 @@ def test_command_uses_module_and_absolute_config(tmp_path):
     assert command[-1] == str(config.resolve())
 
 
+def test_command_preserves_virtualenv_python_symlink(tmp_path):
+    python = tmp_path / ".venv" / "bin" / "python"
+    python.parent.mkdir(parents=True)
+    python.symlink_to(tmp_path / "system-python")
+    assert autostart.command_for(tmp_path / "config.json", python)[0] == str(python)
+
+
 def test_install_macos_writes_plist(tmp_path):
     config = tmp_path / "project" / "config.json"
     config.parent.mkdir()
